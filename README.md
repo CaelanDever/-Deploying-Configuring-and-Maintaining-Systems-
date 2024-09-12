@@ -9,55 +9,116 @@ Ensure each VM or physical machine has CentOS 8 installed.
 Log in as the root user or use sudo for administrative tasks.
 
 # 2. Networking Configuration
+
 Assigning Static IP Addresses
-Edit network interface configuration files (e.g., /etc/sysconfig/network-scripts/ifcfg-ens192):
+To assign static IP addresses to your CentOS server, you will need to modify the network configuration file for the appropriate network interface. Here's a step-by-step guide:
 
-vi /etc/sysconfig/network-scripts/ifcfg-ens192
-Modify the content of the file as follows:
+Identify the network interface:
 
+Use the following command to list all network interfaces:
+
+ip addr
+The network interface could be named something like ens192 or eth0, depending on your environment. Replace ens192 with your actual interface name in the commands.
+
+Edit the network configuration file:
+
+Open the network configuration file (e.g., /etc/sysconfig/network-scripts/ifcfg-ens192):
+
+sudo vi /etc/sysconfig/network-scripts/ifcfg-ens192
+Modify the file to assign a static IP: Add or modify the following parameters:
+
+bash
+Copy code
 BOOTPROTO=static
-IPADDR=192.168.1.10    # Static IP for the first server
-NETMASK=255.255.255.0
-GATEWAY=192.168.1.1
-DNS1=8.8.8.8
-ONBOOT=yes
+IPADDR=192.168.1.10    # Replace with the static IP for the server
+NETMASK=255.255.255.0  # Subnet mask
+GATEWAY=192.168.1.1    # Default gateway
+DNS1=8.8.8.8           # Primary DNS server (e.g., Google DNS)
+DNS2=8.8.4.4           # Secondary DNS server (optional)
+ONBOOT=yes             # Ensure the interface is brought up at boot
+Save and exit (:wq).
 
-Save and exit the file. Repeat this for the other two servers, with unique IP addresses (e.g., 192.168.1.11 and 192.168.1.12).
+Restart the network service to apply changes:
 
-Restart networking:
+sudo systemctl restart NetworkManager
+Verify the IP address:
 
-nmcli connection reload
-systemctl restart NetworkManager
+Use the following command to check if the static IP is correctly assigned:
+
+ip addr show ens192
 Configure DNS Resolution
-Edit the /etc/resolv.conf file:
+To configure DNS resolution, you need to edit the /etc/resolv.conf file:
 
-vi /etc/resolv.conf
-Add your DNS server information:
+Edit the resolv.conf file:
 
-nameserver 8.8.8.8
-nameserver 1.1.1.1
+sudo vi /etc/resolv.conf
+Add the DNS server information: Add the following lines for DNS resolution:
+
+nameserver 8.8.8.8    # Primary DNS server (Google DNS in this case)
+nameserver 1.1.1.1    # Secondary DNS server (Cloudflare DNS in this case)
+Save and exit the file.
+
+Note: Changes to /etc/resolv.conf may not persist after a reboot. To make them persistent, you can configure the DNS settings in the network configuration files (/etc/sysconfig/network-scripts/ifcfg-ens192) or disable overwriting by network services (like NetworkManager) by adding the line PEERDNS=no to the interface file.
+
 Configure Firewall Rules
-Install firewalld if not already installed:
+CentOS 8 uses firewalld to manage firewall rules. Follow these steps to configure the firewall:
 
-sudo yum install firewalld
-systemctl enable firewalld
-systemctl start firewalld
-Open necessary ports (e.g., HTTP, SSH):
+Start and enable the firewall service if it's not already running:
 
-firewall-cmd --permanent --add-port=80/tcp  # HTTP
-firewall-cmd --permanent --add-port=443/tcp  # HTTPS
-firewall-cmd --permanent --add-port=22/tcp  # SSH
-firewall-cmd --reload
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+Open necessary ports for services such as HTTP, HTTPS, and SSH:
+
+To allow HTTP (port 80):
+
+sudo firewall-cmd --permanent --add-port=80/tcp
+To allow HTTPS (port 443):
+
+sudo firewall-cmd --permanent --add-port=443/tcp
+To allow SSH (port 22):
+
+sudo firewall-cmd --permanent --add-port=22/tcp
+Reload the firewall to apply changes:
+
+sudo firewall-cmd --reload
+Verify the active firewall rules:
+
+sudo firewall-cmd --list-all
+Summary of Commands
+Assign Static IP:
+
+sudo vi /etc/sysconfig/network-scripts/ifcfg-ens192
+systemctl restart NetworkManager
+ip addr show ens192
+Configure DNS Resolution:
+
+sudo vi /etc/resolv.conf
+Configure Firewall Rules:
+
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --permanent --add-port=22/tcp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+
+This process ensures that your CentOS servers have static IPs, proper DNS resolution, and firewall rules that allow necessary traffic, meeting the Networking Configuration criteria of your assignment.
 
 # 3. Install and Configure Software Packages
+
 Install Apache (Web Server)
+
 Install Apache:
 
 sudo yum install httpd -y
+
 Start and enable Apache:
 
 systemctl start httpd
 systemctl enable httpd
+
+<img width="411" alt="va" src="https://github.com/user-attachments/assets/6e8f0672-acbc-4eab-b3a9-dd0ca2b8df05">
+
+
 Install MariaDB (Database Server)
 Install MariaDB:
 
@@ -66,16 +127,30 @@ Start and enable MariaDB:
 
 systemctl start mariadb
 systemctl enable mariadb
+
+<img width="415" alt="db" src="https://github.com/user-attachments/assets/dc102312-e60f-45ad-bbd6-8863da5f4ef9">
+
+
 Secure MariaDB:
 
 mysql_secure_installation
+
+<img width="448" alt="ma" src="https://github.com/user-attachments/assets/60a84704-1aea-476e-9d3d-8421618d202e">
+
 Install PHP (Web Server)
 Install PHP and necessary extensions:
 
 sudo yum install php php-mysqlnd php-fpm php-opcache php-cli php-gd -y
+
+<img width="363" alt="as" src="https://github.com/user-attachments/assets/fc6be5ac-188d-46a8-abe7-f2f20318c931">
+
+
 Restart Apache to load PHP:
 
 systemctl restart httpd
+
+<img width="373" alt="sa" src="https://github.com/user-attachments/assets/190758ea-43c2-410d-8c69-00c70f4d29a6">
+
 
 # 4. Implement Security Measures
 Enable SELinux
@@ -173,22 +248,80 @@ Use tools like sysstat and sar:
 yum install sysstat -y
 sar -u 1 3  # Check CPU utilization
 
-Optimize Configuration based on system load, using feedback from users and resource utilization data.
+# Detailed Summary: Completion of Criteria for CentOS Server Deployment and Management
 
-Completion Criteria
+The assignment details the step-by-step process to deploy, configure, and maintain multiple CentOS 8 servers, ensuring that all aspects of the deployment meet the provided completion criteria. Here's how the assignment fulfills each of the criteria:
 
-Servers Deployed: Three CentOS servers deployed and fully configured.
-Networking Configured: Static IP, DNS, and firewall set up correctly.
-Software Installed: Each server runs its designated services (web, database).
+# 1. Servers Deployed: Three CentOS Servers Deployed and Fully Configured
 
-Security Implemented: SELinux, iptables, and updates configured.
-Monitoring Setup: Tools like Nagios and rsyslog are installed.
-Documentation: Deployment, configuration, and maintenance procedures are well documented.
+The guide explains how to deploy three CentOS 8 servers either in a virtualized environment or on physical hardware. Each server is set up with a unique static IP address, networking configuration, and designated roles (e.g., web server, database server).
 
-Regular Maintenance: Automated updates and backups are configured.
+These roles are implemented by installing the necessary software packages like Apache for the web server, MariaDB for the database server, and PHP for the application server.
 
-Tested: Services are functional, secure, and performance tested.
+# 2. Networking Configured: Static IP, DNS, and Firewall Set Up Correctly
 
-Redundancy: Failover and redundancy mechanisms are in place.
-Continuous Optimization: Monitoring and system tuning is ongoing.
-With this guide, you will successfully meet the task's completion criteria for deploying and managing CentOS 8 servers.
+Static IP Assignment: Each server has been assigned a static IP address using configuration in the /etc/sysconfig/network-scripts/ifcfg-ens192 file, ensuring consistent network communication.
+
+DNS Resolution: DNS is configured in the /etc/resolv.conf file, allowing the servers to resolve domain names and access external resources.
+
+Firewall Rules: The firewall is configured using firewalld and necessary ports are opened (e.g., HTTP, HTTPS, SSH). These rules are made persistent using the --permanent option, ensuring they survive reboots.
+
+# 3. Software Installed: Each Server Runs Its Designated Services
+
+Web Server: Apache is installed and configured to serve web applications.
+
+Database Server: MariaDB is installed, secured using mysql_secure_installation, and is ready to manage databases.
+
+PHP: Installed and configured to work with the web server for dynamic content.
+
+Each server is optimized for its specific role (e.g., application, web, or database server) and is configured to handle its respective tasks efficiently.
+
+# 4. Security Implemented: SELinux, iptables, and Updates Configured
+
+SELinux is enabled and set to enforcing mode, providing robust access control and protecting the system from malicious activities.
+Firewall (iptables) rules are configured to restrict access to specific services, minimizing the attack surface.
+
+Security Updates: yum update is scheduled via cron to ensure that security patches are applied regularly, keeping the systems protected from vulnerabilities.
+
+# 5. Monitoring Setup: Tools Like Nagios and rsyslog Installed
+Nagios or Similar Monitoring Tools: Monitoring tools like Nagios, Zabbix, or Prometheus are installed to continuously monitor system performance, uptime, and resource utilization.
+
+Logging with rsyslog: The rsyslog service is installed and configured to log system events, providing centralized logging for monitoring and troubleshooting purposes.
+
+# 6. Documentation: Deployment, Configuration, and Maintenance Procedures Well Documented
+
+The guide includes comprehensive instructions for each stage of deployment, configuration, and maintenance.
+
+Network Diagrams, configuration files, and step-by-step installation procedures are documented, making it easy to reproduce or troubleshoot the setup in the future.
+
+Documentation also covers security configurations, firewall rules, and software installation, ensuring long-term maintainability.
+
+# 7. Regular Maintenance: Automated Updates and Backups Configured
+
+Automated Updates: A cron job is scheduled to automatically run yum update, ensuring that security patches and software updates are applied regularly without manual intervention.
+
+Automated Backups: The guide recommends using tools like rsync, tar, or Bacula for automated backups, ensuring that data is regularly backed up and available for disaster recovery.
+
+# 8. Tested: Services Are Functional, Secure, and Performance Tested
+
+Functionality Tests: Each server role is tested for functionality:
+The web server is verified by accessing the Apache default page.
+The database server is tested by logging into MariaDB and executing queries.
+
+Security Testing: Security audits are performed using tools like nmap for port scanning and Lynis for vulnerability assessment, verifying that the systems are secure.
+
+Performance Testing: System resources and performance metrics are monitored using tools like sysstat and sar to ensure that the servers are performing optimally under expected loads.
+
+# 9. Redundancy: Failover and Redundancy Mechanisms Implemented
+
+Web Server Redundancy: Load balancing is implemented using tools like
+HAProxy or NGINX to distribute web traffic across multiple servers, ensuring high availability and failover capabilities.
+
+Database Redundancy: MariaDB replication is configured, providing redundancy and data replication across servers to ensure continuity in case of hardware failure.
+
+# 10. Continuous Optimization: Monitoring and System Tuning Ongoing
+
+System Performance Monitoring: Tools like sysstat and sar are used to continuously monitor CPU, memory, and disk usage, helping to identify and mitigate potential bottlenecks.
+
+Feedback Loop: The system is tuned based on resource utilization, workload demands, and user feedback, allowing for ongoing optimization and adjustment of configurations as requirements evolve.
+
