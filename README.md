@@ -67,6 +67,9 @@ nameserver 8.8.8.8    # Primary DNS server (Google DNS in this case)
 nameserver 1.1.1.1    # Secondary DNS server (Cloudflare DNS in this case)
 Save and exit the file.
 
+<img width="446" alt="qwq" src="https://github.com/user-attachments/assets/a2e2ed0c-fbc2-45eb-8671-8e5a69f77c28">
+
+
 Note: Changes to /etc/resolv.conf may not persist after a reboot. To make them persistent, you can configure the DNS settings in the network configuration files (/etc/sysconfig/network-scripts/ifcfg-ens192) or disable overwriting by network services (like NetworkManager) by adding the line PEERDNS=no to the interface file.
 
 Configure Firewall Rules
@@ -113,6 +116,9 @@ sudo firewall-cmd --permanent --add-port=443/tcp
 sudo firewall-cmd --permanent --add-port=22/tcp
 sudo firewall-cmd --reload
 sudo firewall-cmd --list-all
+
+<img width="434" alt="fe" src="https://github.com/user-attachments/assets/2becc4b1-97e6-4156-ac43-7740ed14f23d">
+
 
 This process ensures that your CentOS servers have static IPs, proper DNS resolution, and firewall rules that allow necessary traffic, meeting the Networking Configuration criteria of your assignment.
 
@@ -226,6 +232,7 @@ Install Dependencies:
 First, install the required packages for Nagios:
 
 sudo yum install httpd php gcc glibc glibc-common gd gd-devel make net-snmp -y
+
 Download Nagios and Nagios Plugins:
 
 Download Nagios Core and Nagios Plugins from the official website or use wget:
@@ -233,6 +240,10 @@ Download Nagios Core and Nagios Plugins from the official website or use wget:
 cd /tmp
 wget https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.6.tar.gz
 wget https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+
+<img width="451" alt="na" src="https://github.com/user-attachments/assets/d5134995-e74d-475f-99e8-563ed1d7cd04">
+
+
 Extract the Nagios Package:
 
 
@@ -244,6 +255,10 @@ Compile and Install Nagios:
 ./configure
 make all
 sudo make install
+
+<img width="401" alt="nana" src="https://github.com/user-attachments/assets/bea48080-883e-48dc-842b-9707ba9c1154">
+
+
 Install Nagios Plugins:
 
 
@@ -252,6 +267,7 @@ cd nagios-plugins-2.2.1
 ./configure
 make
 sudo make install
+
 Configure Apache to Serve Nagios:
 
 Enable Apache and set up basic Nagios authentication:
@@ -260,6 +276,10 @@ Enable Apache and set up basic Nagios authentication:
 sudo make install-webconf
 sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
 sudo systemctl restart httpd
+
+<img width="448" alt="cac" src="https://github.com/user-attachments/assets/749e3b6a-5e0d-4bd8-bfd1-ed1f307cef39">
+
+
 Start Nagios:
 
 Start the Nagios service and enable it to run at startup:
@@ -267,12 +287,12 @@ Start the Nagios service and enable it to run at startup:
 
 sudo systemctl start nagios
 sudo systemctl enable nagios
+
 Access Nagios Web Interface:
 
 You should now be able to access Nagios by visiting http://<your-server-ip>/nagios in a web browser.
 
 With these steps, you will have set up rsyslog for centralized logging and Nagios for monitoring on your CentOS system.
-
 
 
 # 6. Create Documentation
@@ -316,6 +336,9 @@ Access the Apache web server by visiting http://<server-ip>.
 
 Use mysql -u root -p to check database functionality.
 
+<img width="451" alt="db," src="https://github.com/user-attachments/assets/7f5f55db-bb9e-49e0-bc30-98811161c668">
+
+
 Security Audits: Use tools like nmap to scan open ports and Lynis for security audits.
 
 # 9. Redundancy and Failover Implementation
@@ -351,6 +374,9 @@ The assignment details the step-by-step process to deploy, configure, and mainta
 The guide explains how to deploy three CentOS 8 servers either in a virtualized environment or on physical hardware. Each server is set up with a unique static IP address, networking configuration, and designated roles (e.g., web server, database server).
 
 These roles are implemented by installing the necessary software packages like Apache for the web server, MariaDB for the database server, and PHP for the application server.
+
+<img width="449" alt="hht" src="https://github.com/user-attachments/assets/987e49d8-3186-43b4-8a7b-3fbb2ca881a0">
+
 
 # 2. Networking Configured: Static IP, DNS, and Firewall Set Up Correctly
 
