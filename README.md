@@ -20,15 +20,17 @@ Use the following command to list all network interfaces:
 ip addr
 The network interface could be named something like ens192 or eth0, depending on your environment. Replace ens192 with your actual interface name in the commands.
 
+<img width="448" alt="ipad" src="https://github.com/user-attachments/assets/195d1367-dc23-4446-8708-45c27cd1df82">
+
+
 Edit the network configuration file:
 
-Open the network configuration file (e.g., /etc/sysconfig/network-scripts/ifcfg-ens192):
+Open the network configuration file (e.g., /etc/sysconfig/network-scripts/ifcfg-eth1):
 
-sudo vi /etc/sysconfig/network-scripts/ifcfg-ens192
+sudo vi /etc/sysconfig/network-scripts/ifcfg-eth1
 Modify the file to assign a static IP: Add or modify the following parameters:
 
-bash
-Copy code
+
 BOOTPROTO=static
 IPADDR=192.168.1.10    # Replace with the static IP for the server
 NETMASK=255.255.255.0  # Subnet mask
@@ -38,6 +40,9 @@ DNS2=8.8.4.4           # Secondary DNS server (optional)
 ONBOOT=yes             # Ensure the interface is brought up at boot
 Save and exit (:wq).
 
+<img width="448" alt="vav" src="https://github.com/user-attachments/assets/5253b02d-2255-4f54-bd37-4d9de449757b">
+
+
 Restart the network service to apply changes:
 
 sudo systemctl restart NetworkManager
@@ -45,7 +50,11 @@ Verify the IP address:
 
 Use the following command to check if the static IP is correctly assigned:
 
-ip addr show ens192
+ip addr show eth1
+
+<img width="449" alt="eth" src="https://github.com/user-attachments/assets/37a96a59-9f95-478f-8d20-113d7b2f5cee">
+
+
 Configure DNS Resolution
 To configure DNS resolution, you need to edit the /etc/resolv.conf file:
 
@@ -67,6 +76,10 @@ Start and enable the firewall service if it's not already running:
 
 sudo systemctl start firewalld
 sudo systemctl enable firewalld
+
+<img width="451" alt="dsa" src="https://github.com/user-attachments/assets/ead55afe-bfbe-4e70-bd09-b9ca3b0e1d03">
+
+
 Open necessary ports for services such as HTTP, HTTPS, and SSH:
 
 To allow HTTP (port 80):
@@ -160,9 +173,13 @@ vi /etc/selinux/config
 Set SELINUX=enforcing:
 
 SELINUX=enforcing
+
+<img width="451" alt="se" src="https://github.com/user-attachments/assets/f22ade29-e7e1-4567-9d26-3e52f81361de">
+
 Reboot the system for changes to take effect:
 
 reboot
+
 Configure iptables
 
 Set iptables rules for services:
@@ -170,6 +187,9 @@ Set iptables rules for services:
 firewall-cmd --permanent --add-service=http
 firewall-cmd --permanent --add-service=ssh
 firewall-cmd --reload
+
+<img width="438" alt="fr" src="https://github.com/user-attachments/assets/555c1ecb-17b1-45b9-9f96-1fb84d0a35b7">
+
 
 Install Security Updates
 
@@ -183,13 +203,77 @@ Install Monitoring Tools (e.g., Nagios)
 
 Install Nagios:
 
-Follow official instructions for installing Nagios, or use tools like Zabbix or Prometheus.
+To set up monitoring and logging on your CentOS system, including installing Nagios or rsyslog, you can follow these steps:
 
-Install and configure rsyslog for centralized logging:
+1. Install and Configure rsyslog (Centralized Logging)
+Install rsyslog:
 
 sudo yum install rsyslog -y
-systemctl start rsyslog
-systemctl enable rsyslog
+Start rsyslog:
+
+sudo systemctl start rsyslog
+Enable rsyslog to start on boot:
+
+sudo systemctl enable rsyslog
+Verify rsyslog status:
+
+sudo systemctl status rsyslog
+2. Install Nagios (Monitoring Tool)
+To install Nagios on CentOS, follow these general steps. Make sure to refer to the official Nagios installation documentation if needed.
+
+Install Dependencies:
+
+First, install the required packages for Nagios:
+
+sudo yum install httpd php gcc glibc glibc-common gd gd-devel make net-snmp -y
+Download Nagios and Nagios Plugins:
+
+Download Nagios Core and Nagios Plugins from the official website or use wget:
+
+cd /tmp
+wget https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.6.tar.gz
+wget https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+Extract the Nagios Package:
+
+
+tar zxvf nagios-4.4.6.tar.gz
+cd nagios-4.4.6
+Compile and Install Nagios:
+
+
+./configure
+make all
+sudo make install
+Install Nagios Plugins:
+
+
+tar zxvf nagios-plugins-2.2.1.tar.gz
+cd nagios-plugins-2.2.1
+./configure
+make
+sudo make install
+Configure Apache to Serve Nagios:
+
+Enable Apache and set up basic Nagios authentication:
+
+
+sudo make install-webconf
+sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+sudo systemctl restart httpd
+Start Nagios:
+
+Start the Nagios service and enable it to run at startup:
+
+
+sudo systemctl start nagios
+sudo systemctl enable nagios
+Access Nagios Web Interface:
+
+You should now be able to access Nagios by visiting http://<your-server-ip>/nagios in a web browser.
+
+With these steps, you will have set up rsyslog for centralized logging and Nagios for monitoring on your CentOS system.
+
+
 
 # 6. Create Documentation
 
@@ -214,9 +298,16 @@ crontab -e
 Add:
 
 0 2 * * * /usr/bin/yum update -y
+
+<img width="194" alt="cr" src="https://github.com/user-attachments/assets/2dfa81ef-48c3-4b74-b3aa-0344557bbf3d">
+
+
 Automate Backups using rsync or tar:
 
 rsync -av /var/www/html/ /backup/
+
+<img width="375" alt="caa" src="https://github.com/user-attachments/assets/6dbf4731-06cf-457d-a1d8-1d3358dd1691">
+
 
 # 8. Testing and Validation
 Verify service functionality (e.g., web and database server access):
@@ -247,6 +338,9 @@ Use tools like sysstat and sar:
 
 yum install sysstat -y
 sar -u 1 3  # Check CPU utilization
+
+<img width="448" alt="nk" src="https://github.com/user-attachments/assets/845b8c07-f253-4126-baed-85682e19b2e1">
+
 
 # Detailed Summary: Completion of Criteria for CentOS Server Deployment and Management
 
