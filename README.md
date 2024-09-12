@@ -171,6 +171,10 @@ systemctl restart httpd
 <img width="373" alt="sa" src="https://github.com/user-attachments/assets/190758ea-43c2-410d-8c69-00c70f4d29a6">
 
 
+<img width="374" alt="phs" src="https://github.com/user-attachments/assets/fd6bf694-c8df-4040-bd2c-ae402255f53a">
+
+
+
 # 4. Implement Security Measures
 Enable SELinux
 Edit the SELinux configuration file:
@@ -352,6 +356,29 @@ Database Replication:
 Set up MariaDB replication for redundancy:
 
 Configure the master and slave replication in my.cnf.
+
+Edit the MariaDB Configuration File
+
+Open the MariaDB configuration file on the master server:
+
+
+sudo nano /etc/my.cnf
+Add the following lines under [mysqld]:
+
+
+[mysqld]
+server-id=1
+log_bin=/var/log/mysql/mysql-bin.log
+binlog_do_db=your_database_name
+server-id: A unique ID for the master server (must be unique among all servers in the replication setup).
+log_bin: Path to the binary log file.
+binlog_do_db: The database to be replicated (optional, if you want to replicate all databases, you can omit this line).
+
+
+<img width="380" alt="sds" src="https://github.com/user-attachments/assets/a5bbaa17-31e0-4f79-9583-fe9e030e87e4">
+
+sudo systemctl restart mariadb
+
 
 # 10. Continuous Monitoring and Optimization
 
