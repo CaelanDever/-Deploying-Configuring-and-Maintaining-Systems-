@@ -137,6 +137,15 @@ systemctl enable httpd
 
 <img width="411" alt="va" src="https://github.com/user-attachments/assets/6e8f0672-acbc-4eab-b3a9-dd0ca2b8df05">
 
+open /etc/httpd/conf/httpd.conf.
+
+These two values may already be set in that file, but confirm them to be sure:
+
+DocumentRoot /var/www/html
+Listen 80
+
+<img width="447" alt="apache" src="https://github.com/user-attachments/assets/dd7c1da4-99b2-49b5-9d42-00c0278bfaa4">
+
 
 Install MariaDB (Database Server)
 Install MariaDB:
